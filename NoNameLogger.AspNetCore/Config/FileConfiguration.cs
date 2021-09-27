@@ -9,10 +9,10 @@ namespace NoNameLogger.AspNetCore.Config
     public class FileConfiguration : FileConfig
     {
         public int EventId { get; set; }
+
+        public List<logging.LogLevel> LogLevels { get; set; } = new List<logging.LogLevel>(
+            new[] {logging.LogLevel.Trace, logging.LogLevel.Debug, logging.LogLevel.Information,
+            logging.LogLevel.Warning, logging.LogLevel.Error, logging.LogLevel.Critical, logging.LogLevel.None});
         
-        public Dictionary<logging.LogLevel, ConsoleColor> LogLevels { get; set; } = new Dictionary<logging.LogLevel, ConsoleColor>()
-        {
-            [logging.LogLevel.Information] = ConsoleColor.Green
-        };
     }
 }

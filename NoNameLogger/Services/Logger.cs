@@ -42,12 +42,42 @@ namespace NoNameLogger.Services
             {
                 foreach (var arg in args)
                 {
-                    stringBuilder.Append($"{args.GetType()} ");
+                    stringBuilder.Append($"{arg.GetType()} ");
                 }
             }
             
             
             LogEvent logEvent = new LogEvent(logLevel, exception, message, stringBuilder.ToString());
+            _Log?.Invoke(logEvent);
+        }
+
+        public void Log(LogLevel logLevel, string message, params string[] args)
+        {
+            if (message is null) return;
+            //if (args != null &&
+            //    args.GetType() != typeof(object[]))
+            //    args = new object[] { args };
+            StringBuilder stringBuilder = new StringBuilder();
+            if ((args is null) || (args?.Length == 0))
+            {
+                //var stackFrame = FindStackFrame();
+                //var methodBase = GetCallingMethodBase(stackFrame);
+                //var callingMethod = methodBase.Name;
+                //var callingClass = methodBase.ReflectedType.Name;
+                ////args = new object[] { callingClass, callingMethod };
+                //stringBuilder.Append(callingClass);
+            }
+            else
+            {
+                foreach (var arg in args)
+                {
+                    stringBuilder.Append($"{arg}| ");
+                }
+            }
+
+
+            LogEvent logEvent = new LogEvent(logLevel, null, message, 
+                stringBuilder.ToString().TrimEnd(new char[] { '|', ' ' }));
             _Log?.Invoke(logEvent);
         }
 

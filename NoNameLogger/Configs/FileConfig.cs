@@ -18,8 +18,8 @@ namespace NoNameLogger.Configs
         public string Path { get; set; }
         public RollingInterval RollingInterval { get; set; } = RollingInterval.Infinite;
         public bool RollOnFileSizeLimit { get; set; } = false;
-        public LogLevel MinLogLevel { get; set; } = LogLevel.Debug;
-        public LogLevel MaxLogLevel { get; set; } = LogLevel.Critical;
+        public LogLevel MinLogLevel { get; set; } = LogLevel.Trace;
+        public LogLevel MaxLogLevel { get; set; } = LogLevel.None;
         //public TextWriter TextWriter { get; set; }
 
         /// <summary>

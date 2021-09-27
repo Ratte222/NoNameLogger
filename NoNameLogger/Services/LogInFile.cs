@@ -101,7 +101,15 @@ namespace NoNameLogger.Services
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
             string fullPath = GenerateFileName(path);
-            _fileInfo = new FileInfo(fullPath);
+            if (!(_fileInfo is null) && (_fileInfo?.FullName != fullPath))
+            {
+                _fileInfo = new FileInfo(fullPath);
+                UpdateStreamWriter(updateFileInfo: false);
+            }
+            else
+            {
+                _fileInfo = new FileInfo(fullPath);
+            }
         }
 
         private string GenerateFileName(string path = null, bool overSize = false)
@@ -115,16 +123,34 @@ namespace NoNameLogger.Services
             {
                 _dateTimeLastCreatedFile = DateTime.Now;
                 temp = Path.GetFileNameWithoutExtension(_fileConfig.Path);
-                if (_fileConfig.RollingInterval == RollingInterval.Year)
-                { temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyy")}"; }
-                else if (_fileConfig.RollingInterval == RollingInterval.Month)
-                { temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMM")}"; }
-                else if (_fileConfig.RollingInterval == RollingInterval.Day)
-                { temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMdd")}"; }
-                else if (_fileConfig.RollingInterval == RollingInterval.Hour)
-                { temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMddhh")}"; }
-                else if (_fileConfig.RollingInterval == RollingInterval.Minute)
-                { temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMddhhmm")}"; }
+                //if (_fileConfig.RollingInterval == RollingInterval.Year)
+                //{ temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyy")}"; }
+                //else if (_fileConfig.RollingInterval == RollingInterval.Month)
+                //{ temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMM")}"; }
+                //else if (_fileConfig.RollingInterval == RollingInterval.Day)
+                //{ temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMdd")}"; }
+                //else if (_fileConfig.RollingInterval == RollingInterval.Hour)
+                //{ temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMddhh")}"; }
+                //else if (_fileConfig.RollingInterval == RollingInterval.Minute)
+                //{ temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMddhhmm")}"; }
+                switch (_fileConfig.RollingInterval)
+                {
+                    case RollingInterval.Year:
+                        temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyy")}";
+                        break;
+                    case RollingInterval.Month:
+                        temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMM")}";
+                        break;
+                    case RollingInterval.Day:
+                        temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMdd")}";
+                        break;
+                    case RollingInterval.Hour:
+                        temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMddhh")}";
+                        break;
+                    case RollingInterval.Minute:
+                        temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMddhhmm")}";
+                        break;                    
+                }
                 string[] vs = Directory.GetFiles(path);
                 foreach(string s in vs)//if file name contain number. Example: log20210921_(1).json
                 {
@@ -172,12 +198,15 @@ namespace NoNameLogger.Services
             }
         }
 
-        private void UpdateStreamWriter(bool oversize = false)
+        private void UpdateStreamWriter(bool oversize = false, bool updateFileInfo = true)
         {
             try
             {
                 _waitHandler.WaitOne();
-                _fileInfo = new FileInfo(GenerateFileName(null, oversize));
+                if (updateFileInfo)
+                { 
+                    _fileInfo = new FileInfo(GenerateFileName(null, oversize));
+                }
                 _streamWriter.Flush();
                 _streamWriter.Dispose();
                 _streamWriter = new StreamWriter(_fileInfo.FullName);

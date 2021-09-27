@@ -24,7 +24,7 @@ namespace NoNameLogger.AspNetCore.Loggers
         public IDisposable BeginScope<TState>(TState state) => default;
 
         public bool IsEnabled(logging.LogLevel logLevel) =>
-            _getCurrentConfig().LogLevels.ContainsKey(logLevel);
+            _getCurrentConfig().LogLevels.Contains(logLevel);
 
         public void Log<TState>(
             logging.LogLevel logLevel,
@@ -49,7 +49,8 @@ namespace NoNameLogger.AspNetCore.Loggers
                 //Console.ForegroundColor = originalColor;
                 //Console.WriteLine($"     {_name} - {formatter(state, exception)}");
                 //_logInFile.Log(LogLevelExtension.ToLogLeavel((int)logLevel), )
-                this.Log(LogLevelExtension.ToLogLeavel((int)logLevel), $"{_name} - {formatter(state, exception)}", exception, eventId);
+                this.Log(LogLevelExtension.ToLogLeavel((int)logLevel), formatter(state, exception), _name,
+                    eventId.Id.ToString(), eventId.Name);
             }
         }
     }
