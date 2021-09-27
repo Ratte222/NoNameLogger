@@ -7,17 +7,40 @@ using NoNameLogger.Interfaces;
 
 namespace NoNameLogger.Configs
 {
-    internal class FileConfig:ICommonConfig
+    public class FileConfig:IFileConfig
     {
         public Encoding Encoding { get; set; }
         public TimeSpan? FlushToDiskInterval { get; set; }
-        public long? FileSizeLimitBytes { get; set; }
+        public long? FileSizeLimitBytes { get; set; } = 1073741824;
+        /// <summary>
+        /// Required
+        /// </summary>
         public string Path { get; set; }
-        public RollingInterval RollingInterval { get; set; }
-        public bool RollOnFileSizeLimit { get; set; }
-        public LogLevel MinLogLevel { get; set; }
-        public LogLevel MaxLogLevel { get; set; }
+        public RollingInterval RollingInterval { get; set; } = RollingInterval.Infinite;
+        public bool RollOnFileSizeLimit { get; set; } = false;
+        public LogLevel MinLogLevel { get; set; } = LogLevel.Debug;
+        public LogLevel MaxLogLevel { get; set; } = LogLevel.Critical;
         //public TextWriter TextWriter { get; set; }
+
+        /// <summary>
+        /// Required
+        /// </summary>
         public IFormatter Formatter{get;set;}
+
+
+        public FileConfig CheckConfiguration()
+        {
+            if (String.IsNullOrEmpty(Path)) throw new ArgumentNullException("Path is null or empty");
+            else if (Path.Contains('(') || Path.Contains(')')) throw new ArgumentException("Path contains \'(\' or \')\'");
+            if(Encoding is null)
+            {
+                Encoding = Encoding.UTF8;
+            }
+            if (Formatter is null)
+            { 
+                throw new ArgumentNullException($"{nameof(Formatter)} is null"); 
+            }
+            return this;
+        }
     }
 }

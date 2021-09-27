@@ -6,7 +6,7 @@ using System.Text;
 
 namespace NoNameLogger.Configs
 {
-    internal class ConsoleConfig:ICommonConfig
+    public class ConsoleConfig:ICommonConfig
     {
         public LogLevel MinLogLevel { get; set; }
         public LogLevel MaxLogLevel { get; set; }

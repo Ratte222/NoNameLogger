@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
+using loging = Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NoNameLogger.AspNetCore.Config;
+using NoNameLogger.AspNetCore.Loggers;
 
-namespace NoNameLogger.AspNetCore
+namespace NoNameLogger.AspNetCore.Providers
 {
-    public sealed class ColorConsoleLoggerProvider : ILoggerProvider
+    public sealed class ColorConsoleLoggerProvider : loging.ILoggerProvider
     {
         private readonly IDisposable _onChangeToken;
         private ColorConsoleLoggerConfiguration _currentConfig;
-        private readonly ConcurrentDictionary<string, NoNameLogger> _loggers = new ConcurrentDictionary<string, NoNameLogger>();
+        private readonly ConcurrentDictionary<string, ColorConsoleLogger> _loggers = new ConcurrentDictionary<string, ColorConsoleLogger>();
 
         public ColorConsoleLoggerProvider(
             IOptionsMonitor<ColorConsoleLoggerConfiguration> config)
@@ -19,8 +20,8 @@ namespace NoNameLogger.AspNetCore
             _onChangeToken = config.OnChange(updatedConfig => _currentConfig = updatedConfig);
         }
 
-        public ILogger CreateLogger(string categoryName) =>
-            _loggers.GetOrAdd(categoryName, name => new NoNameLogger(name, GetCurrentConfig));
+        public loging.ILogger CreateLogger(string categoryName) =>
+            _loggers.GetOrAdd(categoryName, name => new ColorConsoleLogger(name, GetCurrentConfig));
 
         private ColorConsoleLoggerConfiguration GetCurrentConfig() => _currentConfig;
 

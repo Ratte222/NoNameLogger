@@ -9,17 +9,17 @@ using System.Linq;
 
 namespace NoNameLogger.Services
 {
-    class LogInFile:ILog, IDisposable
+    public class LogInFile:ILog, IDisposable
     {
         public static AutoResetEvent _waitHandler = new AutoResetEvent(true);
-        private FileConfig _fileConfig;
+        private IFileConfig _fileConfig;
         StreamWriter _streamWriter = null;
         private bool _isDisposed = false;
         private string _fileNameWithoutExtension = "";
         private Timer _timerStreamWriterFlush = null;
         private FileInfo _fileInfo;
         private DateTime _dateTimeLastCreatedFile;
-        public LogInFile(FileConfig fileConfig)
+        public LogInFile(IFileConfig fileConfig)
         {
             _fileConfig = fileConfig;
             

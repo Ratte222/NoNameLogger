@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NoNameLogger.Configs
 {
-    interface ICommonConfig
+    public interface ICommonConfig
     {
         LogLevel MinLogLevel { get; set; }
         LogLevel MaxLogLevel { get; set; }

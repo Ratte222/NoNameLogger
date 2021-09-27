@@ -54,21 +54,13 @@ namespace NoNameLogger.LoggerConfigExtensions
             {
                 fileConfig.MinLogLevel = minLogLevel.Value;
             }
-            else
-            {
-                fileConfig.MinLogLevel = LogLevel.Debug;
-            }
             if (maxLogLevel.HasValue)
             {
                 fileConfig.MaxLogLevel = maxLogLevel.Value;
             }
-            else
-            {
-                fileConfig.MaxLogLevel = LogLevel.Critical;
-            }
             fileConfig.RollOnFileSizeLimit = rollOnFileSizeLimit;
             fileConfig.Formatter = formatter;
-            return sinkConfiguration.AddAction(new LogInFile(fileConfig));
+            return sinkConfiguration.AddAction(new LogInFile(fileConfig.CheckConfiguration()));
         }
     }
 }

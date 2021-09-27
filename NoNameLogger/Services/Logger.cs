@@ -71,12 +71,12 @@ namespace NoNameLogger.Services
 
         
 
-        public void LogErrore(string message, params object[] args)
+        public void LogError(string message, params object[] args)
         {
-            Log(LogLevel.Errore, message, null, args);
+            Log(LogLevel.Error, message, null, args);
         }
 
-        public void LogInfo(string message, params object[] args)
+        public void LogInformation(string message, params object[] args)
         {
             Log(LogLevel.Info, message, null, args);
         }

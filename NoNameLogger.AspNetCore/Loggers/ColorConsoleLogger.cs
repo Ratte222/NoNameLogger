@@ -1,28 +1,29 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
-using NoNameLogger.AspNetCore.Config;
+﻿using NoNameLogger.AspNetCore.Config;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using logging = Microsoft.Extensions.Logging;
 
-
-namespace NoNameLogger.AspNetCore
+namespace NoNameLogger.AspNetCore.Loggers
 {
-    public class NoNameLogger : ILogger
+    public class ColorConsoleLogger : logging.ILogger
     {
         private readonly string _name;
         private readonly Func<ColorConsoleLoggerConfiguration> _getCurrentConfig;
 
-        public NoNameLogger(
+        public ColorConsoleLogger(
             string name,
             Func<ColorConsoleLoggerConfiguration> getCurrentConfig) =>
             (_name, _getCurrentConfig) = (name, getCurrentConfig);
 
         public IDisposable BeginScope<TState>(TState state) => default;
 
-        public bool IsEnabled(LogLevel logLevel) =>
+        public bool IsEnabled(logging.LogLevel logLevel) =>
             _getCurrentConfig().LogLevels.ContainsKey(logLevel);
 
         public void Log<TState>(
-            LogLevel logLevel,
-            EventId eventId,
+            logging.LogLevel logLevel,
+            logging.EventId eventId,
             TState state,
             Exception exception,
             Func<TState, Exception, string> formatter)
@@ -44,5 +45,6 @@ namespace NoNameLogger.AspNetCore
                 Console.WriteLine($"     {_name} - {formatter(state, exception)}");
             }
         }
+        
     }
 }
