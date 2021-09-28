@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace NoNameLogger.Services
 {
-    public class LogInFile:ILog, IDisposable
+    public class LogInFile:ILog
     {
         public static AutoResetEvent _waitHandler = new AutoResetEvent(true);
         private IFileConfig _fileConfig;
@@ -33,6 +33,7 @@ namespace NoNameLogger.Services
         {
             if(!_isDisposed)
             {
+                
                 _timerStreamWriterFlush?.Dispose();
                 _streamWriter?.Flush();
                 _streamWriter?.Dispose();
@@ -47,8 +48,8 @@ namespace NoNameLogger.Services
                 if(logEvent.LogLevel.CheckLogLeavel(_fileConfig))
                 {
                     PrepareToSave();
-                    CheckFileSize();
                     CheckRollingInterval();
+                    CheckFileSize();                    
                     _fileConfig.Formatter.Serialize(_streamWriter, logEvent.ToLog());
                     AfterSave();
                 }                
@@ -81,8 +82,17 @@ namespace NoNameLogger.Services
                 try
                 {
                     _waitHandler.WaitOne();
-                    _streamWriter = new StreamWriter(_fileInfo.FullName,
-                    true, _fileConfig.Encoding, 2048);
+                    if (_fileInfo.Exists)
+                    {
+                        _streamWriter = new StreamWriter(_fileInfo.OpenWrite(),
+                      _fileConfig.Encoding, 2048);
+                    }
+                    else
+                    {
+                        _streamWriter = new StreamWriter(_fileInfo.FullName,
+                        true, _fileConfig.Encoding, 2048);
+                    }
+
                 }
                 finally
                 {
@@ -97,19 +107,24 @@ namespace NoNameLogger.Services
 
         private void PrepareFileNameAndPath()
         {
-            string path = Path.GetDirectoryName(_fileConfig.Path);
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-            string fullPath = GenerateFileName(path);
-            if (!(_fileInfo is null) && (_fileInfo?.FullName != fullPath))
+            if(_fileInfo is null)
             {
+                string path = Path.GetDirectoryName(_fileConfig.Path);
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+                string fullPath = GenerateFileName(path);
+                //if (_fileInfo?.FullName != fullPath)
+                //{
+                //    _fileInfo = new FileInfo(fullPath);
+                //    UpdateStreamWriter(updateFileInfo: false);
+                //}
+                //else
+                //{
+                //    _fileInfo = new FileInfo(fullPath);
+                //}
                 _fileInfo = new FileInfo(fullPath);
-                UpdateStreamWriter(updateFileInfo: false);
             }
-            else
-            {
-                _fileInfo = new FileInfo(fullPath);
-            }
+            
         }
 
         private string GenerateFileName(string path = null, bool overSize = false)
@@ -123,16 +138,6 @@ namespace NoNameLogger.Services
             {
                 _dateTimeLastCreatedFile = DateTime.Now;
                 temp = Path.GetFileNameWithoutExtension(_fileConfig.Path);
-                //if (_fileConfig.RollingInterval == RollingInterval.Year)
-                //{ temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyy")}"; }
-                //else if (_fileConfig.RollingInterval == RollingInterval.Month)
-                //{ temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMM")}"; }
-                //else if (_fileConfig.RollingInterval == RollingInterval.Day)
-                //{ temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMdd")}"; }
-                //else if (_fileConfig.RollingInterval == RollingInterval.Hour)
-                //{ temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMddhh")}"; }
-                //else if (_fileConfig.RollingInterval == RollingInterval.Minute)
-                //{ temp = $"{temp}{_dateTimeLastCreatedFile.ToString("yyyyMMddhhmm")}"; }
                 switch (_fileConfig.RollingInterval)
                 {
                     case RollingInterval.Year:
@@ -152,15 +157,18 @@ namespace NoNameLogger.Services
                         break;                    
                 }
                 string[] vs = Directory.GetFiles(path);
-                foreach(string s in vs)//if file name contain number. Example: log20210921_(1).json
+                _fileNameWithoutExtension = temp;
+                string ext = Path.GetExtension(_fileConfig.Path);
+                var vs_filtered = vs.Where(i => i.Contains(ext)).OrderBy(i => i);
+                foreach (string s in vs_filtered)//if file name contain number. Example: log20210921_(1).json
                 {
                     string s2 = Path.GetFileNameWithoutExtension(s);
-                    if (s2.Contains(_fileNameWithoutExtension))
+                    if (s2.Contains(temp))
                     {
-                        _fileNameWithoutExtension = s2;
+                        if (Path.GetExtension(s) == ext)
+                        { _fileNameWithoutExtension = s2; }
                     }
-                    else
-                        _fileNameWithoutExtension = temp;
+                        
                 }
                 
             }
@@ -170,31 +178,35 @@ namespace NoNameLogger.Services
                 if ((indexStart > -1) &&(indexEnd > -1))
                 {
                     int count;
-                    if(!int.TryParse(_fileNameWithoutExtension.Substring(indexStart, indexEnd), out count))
+                    string vs = _fileNameWithoutExtension.Substring((indexStart + 1), (indexEnd - indexStart - 1));
+                    if (!int.TryParse(vs, out count))
                     {
                         count = int.MinValue;
                     }
-                    
-                    temp = $"{_fileNameWithoutExtension.Substring(0, indexStart)}({count})";
+
+                    _fileNameWithoutExtension = $"{_fileNameWithoutExtension.Substring(0, indexStart)}({++count})";
 
                 }
                 else
                 {
-                    temp = $"{_fileNameWithoutExtension}_({1})";
+                    _fileNameWithoutExtension = $"{_fileNameWithoutExtension}_({1})";
                 }
             }
             
-            return Path.Combine(path, $"{temp}{Path.GetExtension(_fileConfig.Path)}");
+            return Path.Combine(path, $"{_fileNameWithoutExtension}{Path.GetExtension(_fileConfig.Path)}");
         }
 
         private void CheckFileSize()
         {            
             if (_fileConfig.RollOnFileSizeLimit)
             { 
+                
+                _fileInfo = new FileInfo(_fileInfo.FullName);
                 if (_fileInfo.Length >= _fileConfig.FileSizeLimitBytes)
                 {
                     UpdateStreamWriter(true);
                 }
+                
             }
         }
 
@@ -256,6 +268,11 @@ namespace NoNameLogger.Services
         void StreamWriterFlush(object state)
         {
             _streamWriter?.Flush();
+        }
+
+        public void FlushAndClose()
+        {
+            Dispose();
         }
     }
 }

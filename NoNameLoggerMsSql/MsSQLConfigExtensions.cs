@@ -25,7 +25,7 @@ namespace NoNameLoggerMsSql
             config.CreateTable = createTable;
             if(formatter is null)
             {
-                config.Formatter = new ConsoleFormatter();
+                config.Formatter = new StringFormatter();
             }
             else
             {

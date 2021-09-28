@@ -58,5 +58,15 @@ namespace NoNameLogger.AspNetCore
             return builder;
         }
 
+        public static ILoggingBuilder AddNoNameLogger(this ILoggingBuilder builder, Action<NoNameLoggerConfig> configure)
+        {
+            builder.AddConfiguration();
+            builder.Services.TryAddEnumerable(
+                ServiceDescriptor.Singleton<ILoggerProvider, NoNameLoggerProvider>());
+            LoggerProviderOptions.RegisterProviderOptions
+                <NoNameLoggerConfig, NoNameLoggerProvider>(builder.Services);
+            builder.Services.Configure(configure);
+            return builder;
+        }
     }
 }

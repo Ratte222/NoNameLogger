@@ -13,12 +13,15 @@ namespace NoNameLogger.Services
     public class Logger : ILogger
     {
         //delegate void ActionLog(LogEvent logEvent, TextWriter textWriter);
+        private bool _isDisposed = false;
+        event Action _Dispose;
         event Action<LogEvent> _Log;
         public Logger(List<ILog> logs)
         {
             foreach(var act in logs)
             {
                 _Log += act.Log;
+                _Dispose += act.Dispose;
             }
         }
 
@@ -137,6 +140,20 @@ namespace NoNameLogger.Services
         {
             return stackFrame == null
                 ? MethodBase.GetCurrentMethod() : stackFrame.GetMethod();
+        }
+
+        public void FlushAndClosed()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (!_isDisposed)
+            {
+                _Dispose?.Invoke();
+                _isDisposed = true;
+            }
         }
     }
 }

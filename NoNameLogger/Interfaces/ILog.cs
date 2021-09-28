@@ -5,8 +5,9 @@ using System.Text;
 
 namespace NoNameLogger.Interfaces
 {
-    public interface ILog
+    public interface ILog:IDisposable
     {
         public void Log(LogEvent logEvent);
+        //public void FlushAndClose();
     }
 }

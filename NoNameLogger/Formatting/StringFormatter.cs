@@ -8,7 +8,7 @@ using System.Text;
 
 namespace NoNameLogger.Formatting
 {
-    public class ConsoleFormatter : IFormatter
+    public class StringFormatter : IFormatter
     {
         public void Serialize(StreamWriter streamWriter, Log log)
         {

@@ -10,9 +10,10 @@ namespace NoNameLogger.Formatting
     public class JsonFormatter: IFormatter
     {
         
-        JsonSerializer serializer = null;
-        JsonTextWriter writer = null;
-
+        JsonSerializer _serializer = null;
+        JsonTextWriter _writer = null;
+        StreamWriter _streamWriter = null;
+        TextWriter _textWriter = null;
         //bool isDisposed = false;
         //public void Dispose()
         //{
@@ -24,40 +25,49 @@ namespace NoNameLogger.Formatting
 
         public void Serialize(StreamWriter streamWriter, Log log)
         {
-            if(serializer is null)
+            if(_serializer is null)
             {
-                serializer = new JsonSerializer();
-                serializer.Converters.Add(new JavaScriptDateTimeConverter());
-                serializer.NullValueHandling = NullValueHandling.Ignore;
+                _serializer = new JsonSerializer();
+                _serializer.Converters.Add(new JavaScriptDateTimeConverter());
+                _serializer.NullValueHandling = NullValueHandling.Ignore;
+            }            
+            if(_writer is null)
+            {
+                _streamWriter = streamWriter;
+                _writer = new JsonTextWriter(streamWriter);
             }
-            if(writer is null)
+            else if (!streamWriter.Equals(_streamWriter))
             {
-                writer = new JsonTextWriter(streamWriter);
+                _streamWriter = streamWriter;
+                _writer = new JsonTextWriter(streamWriter);
             }
 
-
-            //writer.Formatting = Newtonsoft.Json.Formatting.Indented;
-            //writer.Indentation = 4;
-            //writer.IndentChar = ' ';
-            serializer.Serialize(writer, log);
+                //writer.Formatting = Newtonsoft.Json.Formatting.Indented;
+                //writer.Indentation = 4;
+                //writer.IndentChar = ' ';
+                _serializer.Serialize(_writer, log);
             streamWriter.WriteLine("");
-            
         }
 
         public void Serialize(TextWriter textWriter, Log log)
         {
-            if (serializer is null)
+            if (_serializer is null)
             {
-                serializer = new JsonSerializer();
-                serializer.Converters.Add(new JavaScriptDateTimeConverter());
-                serializer.NullValueHandling = NullValueHandling.Ignore;
+                _serializer = new JsonSerializer();
+                _serializer.Converters.Add(new JavaScriptDateTimeConverter());
+                _serializer.NullValueHandling = NullValueHandling.Ignore;
             }
-            if (writer is null)
+            if (_writer is null)
             {
-                writer = new JsonTextWriter(textWriter);
+                _writer = new JsonTextWriter(textWriter);
+            }
+            else if (!textWriter.Equals(_textWriter))
+            {
+                _textWriter = textWriter;
+                _writer = new JsonTextWriter(textWriter);
             }
 
-            serializer.Serialize(writer, log);
+            _serializer.Serialize(_writer, log);
             textWriter.WriteLine("");
         }
     }

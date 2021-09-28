@@ -20,6 +20,11 @@ namespace NoNameLoggerMsSql.Services
             _config = config;
         }
 
+        public void Dispose()
+        {
+            
+        }
+
         public void Log(LogEvent logEvent)
         {
             try

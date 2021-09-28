@@ -19,6 +19,16 @@ namespace NoNameLogger.Services
             _consoleConfig = consoleConfig;
         }
 
+        public void Dispose()
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void FlushAndClose()
+        {
+            //throw new NotImplementedException();
+        }
+
         public void Log(LogEvent logEvent)
         {
             try

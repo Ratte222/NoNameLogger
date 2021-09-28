@@ -20,7 +20,7 @@ namespace NoNameLogger.LoggerConfigExtensions
             ConsoleConfig consoleConfig = new ConsoleConfig();
             if(formatter is null)
             {
-                consoleConfig.Formatter = new ConsoleFormatter();
+                consoleConfig.Formatter = new StringFormatter();
             }
             else
             {

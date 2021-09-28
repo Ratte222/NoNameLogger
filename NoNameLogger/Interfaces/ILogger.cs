@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NoNameLogger.Interfaces
 {
-    public interface ILogger
+    public interface ILogger:IDisposable
     {
         public void LogDebug(string message, params object[] args);
         public void LogInformation(string message, params object[] args);
@@ -12,6 +12,7 @@ namespace NoNameLogger.Interfaces
         public void LogError(string message, params object[] args);
         public void LogCritical(string message, params object[] args);
         public void Log(LogLevel logLevel, string message, Exception exception = null, params object[] args);
-        //public void CloseAndFlush();
+        public void Log(LogLevel logLevel, string message, params string[] args);
+        //public void FlushAndClosed();
     }
 }
