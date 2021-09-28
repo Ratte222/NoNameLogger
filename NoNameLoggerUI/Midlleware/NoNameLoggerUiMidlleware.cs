@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -7,11 +8,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using NoNameLogger.Model;
+using NoNameLoggerUI.DTO;
+using NoNameLoggerUI.Extensions;
 using NoNameLoggerUI.Filters;
+using NoNameLoggerUI.Helpers;
 using NoNameLoggerUI.Interface;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -25,11 +34,20 @@ namespace NoNameLoggerUI.Middleware
         private readonly string _routePrefix = "NoNameLoggerUI";
         private readonly RequestDelegate _next;
         private readonly StaticFileMiddleware _staticFileMiddleware;
+        private readonly JsonSerializerSettings _jsonSerializerOptions;
+        private readonly ILogger<NoNameLoggerUiMidlleware> _logger;
         public NoNameLoggerUiMidlleware(RequestDelegate next, IWebHostEnvironment hostingEnv,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory, ILogger<NoNameLoggerUiMidlleware> logger)
         {
             _next = next;
+            _logger = logger;
             _staticFileMiddleware = CreateStaticFileMiddleware(next, hostingEnv, loggerFactory);
+            _jsonSerializerOptions = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                Formatting = Formatting.None
+            };
         }
 
 
@@ -38,7 +56,32 @@ namespace NoNameLoggerUI.Middleware
             var httpMethod = httpContext.Request.Method;
             var path = httpContext.Request.Path.Value;
 
-            
+            if (httpMethod == "GET" && Regex.IsMatch(path, $"^/{Regex.Escape(_routePrefix)}/api/logs/?$", RegexOptions.IgnoreCase))
+            {
+                try
+                {
+                    httpContext.Response.ContentType = "application/json;charset=utf-8";
+                    
+
+                    var result = FetchLogsAsync(httpContext);
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.OK;
+                    await httpContext.Response.WriteAsync(result);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, ex.Message);
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                    var errorMessage = httpContext.Request.IsLocal()
+                        ? JsonConvert.SerializeObject(new { errorMessage = ex.Message })
+                        : JsonConvert.SerializeObject(new { errorMessage = "Internal server error" });
+
+                    await httpContext.Response.WriteAsync(JsonConvert.SerializeObject(new { errorMessage }));
+                }
+
+                return;
+            }
+
             if (httpMethod == "GET" && Regex.IsMatch(path, $"^/?{Regex.Escape(_routePrefix)}/?$", RegexOptions.IgnoreCase))
             {
                 var indexUrl = httpContext.Request.GetEncodedUrl().TrimEnd('/') + "/index.html";
@@ -82,7 +125,9 @@ namespace NoNameLoggerUI.Middleware
 
             await using var stream = IndexStream();
             var htmlBuilder = new StringBuilder(await new StreamReader(stream).ReadToEndAsync());
-            htmlBuilder.Replace("%(TableData)", CreateTableData(httpContext));
+            string nil = "nil";
+            htmlBuilder.Replace("%(Configs)", JsonConvert.SerializeObject(
+                new { _routePrefix, nil }, _jsonSerializerOptions));
 
             await response.WriteAsync(htmlBuilder.ToString(), Encoding.UTF8);
         }
@@ -93,10 +138,10 @@ namespace NoNameLoggerUI.Middleware
         private string CreateTableData(HttpContext httpContext)
         {
             var provider = httpContext.RequestServices.GetService<IDataProvider>();
-            LogFilter logFilter = new LogFilter();
-            var logs = provider.FetchLogs(logFilter);
+            (LogFilter logFilter, PageResponse<Log> pageResponse) = GetParameterFromRequest(httpContext);
+            pageResponse.Items = provider.FetchLogs(logFilter, pageResponse);
             StringBuilder htmlTableBody = new StringBuilder();
-            foreach(var log in logs)
+            foreach(var log in pageResponse.Items)
             {
                 htmlTableBody.AppendLine("<tr>");
                 htmlTableBody.AppendLine($"<td>{log.Id}</td>");
@@ -109,6 +154,56 @@ namespace NoNameLoggerUI.Middleware
                 htmlTableBody.AppendLine("</tr>");
             }
             return htmlTableBody.ToString();
+        }
+
+        private string FetchLogsAsync(HttpContext httpContext)
+        {
+            var provider = httpContext.RequestServices.GetService<IDataProvider>();
+            (LogFilter logFilter, PageResponse<Log> pageResponse) = GetParameterFromRequest(httpContext);
+            pageResponse.Items = provider.FetchLogs(logFilter, pageResponse);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Log, LogDTO>()
+            .ForMember(dest => dest.RowNo, opt => opt.MapFrom(scr => scr.Id))
+            .ForMember(dest => dest.Timestemp, opt => opt.MapFrom(scr => scr.TimeStamp)));
+            var mapper = new Mapper(config);
+            var logs = mapper.Map<IEnumerable<Log>, IEnumerable<LogDTO>>(pageResponse.Items);
+              int total = pageResponse.ItemCount;
+            int count = pageResponse.PageLength;
+            int currentPage = pageResponse.PageNumber;
+            var result = JsonConvert.SerializeObject(new { logs, total,
+                count, currentPage }, _jsonSerializerOptions);
+            return result;
+        }
+
+        private (LogFilter, PageResponse<Log>) GetParameterFromRequest(HttpContext httpContext)
+        {
+            httpContext.Request.Query.TryGetValue("page", out var pageStr);
+            httpContext.Request.Query.TryGetValue("count", out var countStr);
+            httpContext.Request.Query.TryGetValue("level", out var levelStr);
+            httpContext.Request.Query.TryGetValue("search", out var searchStr);
+            httpContext.Request.Query.TryGetValue("startDate", out var startDateStar);
+            httpContext.Request.Query.TryGetValue("endDate", out var endDateStar);
+
+            int.TryParse(pageStr, out var currentPage);
+            int.TryParse(countStr, out var count);
+
+            DateTime.TryParse(startDateStar, out var startDate);
+            DateTime.TryParse(endDateStar, out var endDate);
+
+            if (endDate != default)
+                endDate = new DateTime(endDate.Year, endDate.Month, endDate.Day, 23, 59, 59);
+
+            currentPage = currentPage == default ? 1 : currentPage;
+            count = count == default ? 10 : count;
+
+            var filter = new LogFilter()
+            {
+                StartDate = startDate == default ? (DateTime?)null : startDate,
+                EndDate = endDate == default ? (DateTime?)null : endDate,
+                LevelString = levelStr,
+                SearchString = searchStr
+            };
+            PageResponse<Log> pageResponse = new Helpers.PageResponse<Log>(count, currentPage);
+            return (filter, pageResponse);
         }
     }
 }

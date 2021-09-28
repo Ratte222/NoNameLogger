@@ -5,17 +5,47 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="wwwroot\dist\bootstrap.bundle.min.js" />
+    <None Remove="wwwroot\dist\bootstrap.min.css" />
+    <None Remove="wwwroot\dist\font-awesome.min.css" />
+    <None Remove="wwwroot\dist\fontawesome-webfont.eot" />
+    <None Remove="wwwroot\dist\fontawesome-webfont.svg" />
+    <None Remove="wwwroot\dist\fontawesome-webfont.ttf" />
+    <None Remove="wwwroot\dist\fontawesome-webfont.woff" />
+    <None Remove="wwwroot\dist\fontawesome-webfont.woff2" />
+    <None Remove="wwwroot\dist\FontAwesome.otf" />
+    <None Remove="wwwroot\dist\jquery-3.5.1.min.js" />
+    <None Remove="wwwroot\dist\main.css" />
+    <None Remove="wwwroot\dist\main.js" />
+    <None Remove="wwwroot\dist\main.min.css" />
+    <None Remove="wwwroot\dist\main.min.js" />
+    <None Remove="wwwroot\dist\netstack.min.js" />
     <None Remove="wwwroot\index.html" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="wwwroot\dist\bootstrap.bundle.min.js" />
+    <EmbeddedResource Include="wwwroot\dist\bootstrap.min.css" />
+    <EmbeddedResource Include="wwwroot\dist\font-awesome.min.css" />
+    <EmbeddedResource Include="wwwroot\dist\fontawesome-webfont.eot" />
+    <EmbeddedResource Include="wwwroot\dist\fontawesome-webfont.svg" />
+    <EmbeddedResource Include="wwwroot\dist\fontawesome-webfont.ttf" />
+    <EmbeddedResource Include="wwwroot\dist\fontawesome-webfont.woff" />
+    <EmbeddedResource Include="wwwroot\dist\fontawesome-webfont.woff2" />
+    <EmbeddedResource Include="wwwroot\dist\FontAwesome.otf" />
+    <EmbeddedResource Include="wwwroot\dist\jquery-3.5.1.min.js" />
+    <EmbeddedResource Include="wwwroot\dist\main.css" />
+    <EmbeddedResource Include="wwwroot\dist\main.js" />
+    <EmbeddedResource Include="wwwroot\dist\main.min.css" />
+    <EmbeddedResource Include="wwwroot\dist\main.min.js" />
+    <EmbeddedResource Include="wwwroot\dist\netstack.min.js" />
     <EmbeddedResource Include="wwwroot\index.html" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="wwwroot\dist\" />
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NoNameLogger\NoNameLogger.csproj" />

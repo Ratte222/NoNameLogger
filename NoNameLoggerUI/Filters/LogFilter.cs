@@ -5,10 +5,12 @@ using System.Text;
 namespace NoNameLoggerUI.Filters
 {
     public class LogFilter
-    {
+    {        
         public string OrderBy { get; set; }
         public string OrderByField { get; set; }
-        public int Take { get; set; } = 10;
-        public int Skip { get; set; } = 0;
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string LevelString { get; set; }
+        public string SearchString { get; set; }
     }
 }

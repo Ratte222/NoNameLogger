@@ -9,6 +9,8 @@ using NoNameLogger.Extensions;
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
+using NoNameLoggerUI.Helpers;
+using System.Text;
 
 namespace NoNameLoggerMsSqlServerDataProvider.Services
 {
@@ -21,15 +23,36 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
             _config = config;
         }
 
-        public IEnumerable<Log> FetchLogs(LogFilter logFilter)
+        public IEnumerable<Log> FetchLogs(LogFilter logFilter, PageResponse<Log> pageResponse)
         {
+            bool firstWhere = true;
             CheckFilter(logFilter);
-            string query = $"SELECT * FROM {_config.TableName}" +
-                $" ORDER BY {logFilter.OrderByField} {logFilter.OrderBy} " +
-                    $"OFFSET {logFilter.Skip} ROWS FETCH NEXT {logFilter.Take} ROWS ONLY";
+            StringBuilder query = new StringBuilder();
+            query.Append($"SELECT * FROM {_config.TableName} ");
+            if (logFilter.StartDate.HasValue || logFilter.EndDate.HasValue || 
+                !String.IsNullOrEmpty(logFilter.SearchString) || !String.IsNullOrEmpty(logFilter.LevelString))
+            {
+                query.Append("WHERE ");
+            }
+            if(!String.IsNullOrEmpty(logFilter.SearchString))
+            {
+                if(!firstWhere)
+                { query.Append("AND "); }
+                query.Append($"[{nameof(Log.Message)}] = '{logFilter.SearchString}' ");
+                firstWhere = false;
+            }
+            if (!String.IsNullOrEmpty(logFilter.LevelString))
+            {
+                if (!firstWhere)
+                { query.Append("AND "); }
+                query.Append($"[{nameof(Log.Level)}] = '{logFilter.LevelString}' ");
+                firstWhere = false;
+            }
+            query.Append($" ORDER BY {logFilter.OrderByField} {logFilter.OrderBy} " +
+            $"OFFSET {pageResponse.Skip} ROWS FETCH NEXT {pageResponse.Take} ROWS ONLY");
             using (IDbConnection db = new SqlConnection(_config.ConnectionString))
             {
-                return db.Query<Log>(query);
+                return db.Query<Log>(query.ToString());
             }
         }
 
