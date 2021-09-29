@@ -12,6 +12,17 @@ namespace NoNameLoggerMsSql
 {
     public static class MsSQLConfigExtensions
     {
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sinkConfiguration"></param>
+        /// <param name="connectionString"></param>
+        /// <param name="tableName"></param>
+        /// <param name="schemaName"></param>
+        /// <param name="formatter"></param>
+        /// <param name="createTable">Do not work!!!</param>
+        /// <returns></returns>
         public static LoggerConfiguration MsSQLServer(this LoggerSinkConfiguration sinkConfiguration, string connectionString,
             string tableName, string schemaName = "dbo", IFormatter formatter = null, bool createTable = false)
         {
