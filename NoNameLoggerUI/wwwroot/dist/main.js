@@ -199,6 +199,8 @@ const levelClass = (logLevel) => {
             return "bg-warning";
         case "Error":
             return "bg-danger";
+        case "Critical":
+            return "bg-danger";
         default:
             return "";
     }

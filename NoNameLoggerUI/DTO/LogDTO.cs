@@ -9,7 +9,8 @@ namespace NoNameLoggerUI.DTO
         public string PropertyType { get; set; }
         public int RowNo { get; set; }
         public string Level { get; set; }
-        public DateTime Timestemp { get; set; }
+        public string Message { get; set; }
+        public DateTime Timestamp { get; set; }
         public string Properties { get; set; }
     }
 }

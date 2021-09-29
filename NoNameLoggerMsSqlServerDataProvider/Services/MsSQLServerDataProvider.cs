@@ -25,60 +25,46 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
 
         public IEnumerable<Log> FetchLogs(LogFilter logFilter, PageResponse<Log> pageResponse)
         {
-            bool firstWhere = true;
+            var queryBuilder = new StringBuilder();
+            queryBuilder.Append("SELECT [Id], [Message], [Level], [TimeStamp], [Exception], [Properties] FROM [");
+            queryBuilder.Append(_config.SchemaName);
+            queryBuilder.Append("].[");
+            queryBuilder.Append(_config.TableName);
+            queryBuilder.Append("] ");
             CheckFilter(logFilter);
-            StringBuilder query = new StringBuilder();
-            query.Append($"SELECT * FROM {_config.TableName} ");
-            if (logFilter.StartDate.HasValue || logFilter.EndDate.HasValue || 
-                !String.IsNullOrEmpty(logFilter.SearchString) || !String.IsNullOrEmpty(logFilter.LevelString))
-            {
-                query.Append("WHERE ");
-            }
-            if(!String.IsNullOrEmpty(logFilter.SearchString))
-            {
-                if(!firstWhere)
-                { query.Append("AND "); }
-                query.Append($"[{nameof(Log.Message)}] = '{logFilter.SearchString}' ");
-                firstWhere = false;
-            }
-            if (!String.IsNullOrEmpty(logFilter.LevelString))
-            {
-                if (!firstWhere)
-                { query.Append("AND "); }
-                query.Append($"[{nameof(Log.Level)}] = '{logFilter.LevelString}' ");
-                firstWhere = false;
-            }
-            query.Append($" ORDER BY {logFilter.OrderByField} {logFilter.OrderBy} " +
+            GenerateWhereClause(queryBuilder, logFilter);
+            queryBuilder.Append($" ORDER BY {logFilter.OrderByField} {logFilter.OrderBy} " +
             $"OFFSET {pageResponse.Skip} ROWS FETCH NEXT {pageResponse.Take} ROWS ONLY");
             using (IDbConnection db = new SqlConnection(_config.ConnectionString))
             {
-                return db.Query<Log>(query.ToString());
+                return db.Query<Log>(queryBuilder.ToString(), new
+                {
+                    StartDate = logFilter.StartDate,
+                    EndDate = logFilter.EndDate
+                });
             }
         }
 
+        
         public long CountLogs(LogFilter logFilter)
         {
             CheckFilter(logFilter);
-            long count = 0;
-            using(SqlCommand command = new SqlCommand())
+            var queryBuilder = new StringBuilder();
+            queryBuilder.Append($"SELECT Count({nameof(Log.Id)}) FROM [");
+            queryBuilder.Append(_config.SchemaName);
+            queryBuilder.Append("].[");
+            queryBuilder.Append(_config.TableName);
+            queryBuilder.Append("] ");
+            GenerateWhereClause(queryBuilder, logFilter);
+            using (IDbConnection connection = new SqlConnection(_config.ConnectionString))
             {
-                using (SqlConnection sqlConnection = new SqlConnection(_config.ConnectionString))
+                return connection.ExecuteScalar<long>(queryBuilder.ToString(), new
                 {
-                    command.CommandText = $"SELECT Count(*) FROM {_config.TableName}";
-                    sqlConnection.Open();
-                    command.Connection = sqlConnection;
-                    string response = "";
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            response = reader[0].ToString();
-                        }
-                    }
-                    long.TryParse(response, out count);
-                }
+                    StartDate = logFilter.StartDate,
+                    EndDate = logFilter.EndDate
+                });
             }
-            return count;
+            
         }
 
         private void CheckFilter(LogFilter logFilter)
@@ -95,6 +81,48 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
             {
                 Log log = new Log();
                 logFilter.OrderByField = nameof(log.TimeStamp);
+            }
+        }
+
+        private void GenerateWhereClause(
+            StringBuilder queryBuilder,
+            LogFilter logFilter)
+        {
+            bool firstWhere = true;
+            if (logFilter.StartDate.HasValue || logFilter.EndDate.HasValue ||
+                !String.IsNullOrEmpty(logFilter.SearchString) || !String.IsNullOrEmpty(logFilter.LevelString))
+            {
+                queryBuilder.Append("WHERE ");
+            }
+            if (!String.IsNullOrEmpty(logFilter.SearchString))
+            {
+                if (!firstWhere)
+                { queryBuilder.Append("AND "); }
+                queryBuilder.Append($"[{nameof(Log.Message)}] LIKE '%{logFilter.SearchString}%' " +
+                    $"OR [{nameof(Log.Exception)}] LIKE '%{logFilter.SearchString}%' ");
+                firstWhere = false;
+            }
+            if (!String.IsNullOrEmpty(logFilter.LevelString))
+            {
+                if (!firstWhere)
+                { queryBuilder.Append("AND "); }
+                queryBuilder.Append($"[{nameof(Log.Level)}] = '{logFilter.LevelString}' ");
+                firstWhere = false;
+            }
+            if(logFilter.StartDate.HasValue)
+            {
+                if (!firstWhere)
+                { queryBuilder.Append("AND "); }
+                //queryBuilder.Append($"[{nameof(Log.TimeStamp)}] >= {logFilter.StartDate.Value} ");
+                queryBuilder.Append($"[{nameof(Log.TimeStamp)}] >= @StartDate ");
+                firstWhere = false;
+            }
+            if (logFilter.EndDate.HasValue)
+            {
+                if (!firstWhere)
+                { queryBuilder.Append("AND "); }
+                queryBuilder.Append($"[{nameof(Log.TimeStamp)}] <= @EndDate ");
+                firstWhere = false;
             }
         }
     }

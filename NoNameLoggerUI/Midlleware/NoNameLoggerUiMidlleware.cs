@@ -163,10 +163,13 @@ namespace NoNameLoggerUI.Middleware
             pageResponse.Items = provider.FetchLogs(logFilter, pageResponse);
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Log, LogDTO>()
             .ForMember(dest => dest.RowNo, opt => opt.MapFrom(scr => scr.Id))
-            .ForMember(dest => dest.Timestemp, opt => opt.MapFrom(scr => scr.TimeStamp)));
+            .ForMember(dest => dest.PropertyType, opt => opt.MapFrom(scr => "xml"))
+            .ForMember(dest => dest.Properties, opt => opt.MapFrom(scr => $"<properties>{scr.Properties}</properties>"))
+            .ForMember(dest => dest.Level, opt => opt.MapFrom(scr => (LogLevel)Enum.Parse(typeof(NoNameLogger.LogLevel), scr.Level)))
+            .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(scr => scr.TimeStamp)));
             var mapper = new Mapper(config);
             var logs = mapper.Map<IEnumerable<Log>, IEnumerable<LogDTO>>(pageResponse.Items);
-              int total = pageResponse.ItemCount;
+              long total = provider.CountLogs(logFilter);
             int count = pageResponse.PageLength;
             int currentPage = pageResponse.PageNumber;
             var result = JsonConvert.SerializeObject(new { logs, total,
