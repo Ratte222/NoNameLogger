@@ -6,7 +6,7 @@ using System.Text;
 
 namespace NoNameLogger.Extensions
 {
-    public static class MappinfLogEventExtension
+    public static class MappingLogEventExtension
     {
         public static Log ToLog(this LogEvent logEvent)
         {

@@ -1,6 +1,7 @@
 ﻿using NoNameLogger.Configs;
 using NoNameLogger.Interfaces;
 using NoNameLogger.Services;
+using NoNameLogger.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;

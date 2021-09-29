@@ -1,4 +1,5 @@
 ﻿using NoNameLogger.Interfaces;
+using NoNameLogger.Enums;
 using System;
 using System.Collections.Generic;
 

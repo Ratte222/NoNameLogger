@@ -165,7 +165,7 @@ namespace NoNameLoggerUI.Middleware
             .ForMember(dest => dest.RowNo, opt => opt.MapFrom(scr => scr.Id))
             .ForMember(dest => dest.PropertyType, opt => opt.MapFrom(scr => "xml"))
             .ForMember(dest => dest.Properties, opt => opt.MapFrom(scr => $"<properties>{scr.Properties}</properties>"))
-            .ForMember(dest => dest.Level, opt => opt.MapFrom(scr => (LogLevel)Enum.Parse(typeof(NoNameLogger.LogLevel), scr.Level)))
+            .ForMember(dest => dest.Level, opt => opt.MapFrom(scr => (LogLevel)Enum.Parse(typeof(NoNameLogger.Enums.LogLevel), scr.Level)))
             .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(scr => scr.TimeStamp)));
             var mapper = new Mapper(config);
             var logs = mapper.Map<IEnumerable<Log>, IEnumerable<LogDTO>>(pageResponse.Items);

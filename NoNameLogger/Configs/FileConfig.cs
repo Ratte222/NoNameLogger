@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using NoNameLogger.Formatting;
+using NoNameLogger.Enums;
 using NoNameLogger.Interfaces;
 
 namespace NoNameLogger.Configs
