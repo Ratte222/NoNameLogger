@@ -5,9 +5,9 @@ using System.Text;
 
 namespace NoNameLogger.Configs.Notification
 {
-    public class WebNotificationConfig:ICommonNotificationConfig
+    public class WebNotificationConfig:BaseConfig
     {
-        public NotificationType NotificationType { get; set; }
+        //public NotificationType NotificationType { get; set; }
         public string Url { get; set; }
 
         /// <example>GET, POST</example>

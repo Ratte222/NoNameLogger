@@ -70,5 +70,10 @@ namespace NoNameLogger.Formatting
             _serializer.Serialize(_writer, log);
             textWriter.WriteLine("");
         }
+
+        public string Serialize(Log log)
+        {
+            return JsonConvert.SerializeObject(log);
+        }
     }
 }

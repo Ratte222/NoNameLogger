@@ -8,7 +8,7 @@ namespace NoNameLogger.Extensions
 {
     static class CommonLogExtension
     {
-        public static bool CheckLogLeavel(this LogLevel logLevel, ICommonConfig config)
+        public static bool CheckLogLeavel(this LogLevel logLevel, BaseConfig config)
         {
             if ((logLevel <= config.MaxLogLevel) && (logLevel >= config.MinLogLevel))
                 return true;

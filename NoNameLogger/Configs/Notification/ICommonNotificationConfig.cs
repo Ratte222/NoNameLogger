@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NoNameLogger.Configs.Notification
 {
-    public interface ICommonNotificationConfig
+    public interface ICommonConfig
     {
         public NotificationType NotificationType { get; set; }
     }

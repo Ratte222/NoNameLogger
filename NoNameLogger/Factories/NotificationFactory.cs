@@ -21,7 +21,7 @@ namespace NoNameLogger.Factories
             List<INotification> notifications = new List<INotification>();
             foreach(var config in _config.configs)
             {
-                ICommonNotificationConfig commonNotificationConfig = config as ICommonNotificationConfig;
+                ICommonConfig commonNotificationConfig = config as ICommonConfig;
                 if(commonNotificationConfig != null)
                 {
                     switch(commonNotificationConfig.NotificationType)

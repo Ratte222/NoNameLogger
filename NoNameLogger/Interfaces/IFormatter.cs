@@ -8,5 +8,6 @@ namespace NoNameLogger.Interfaces
     {
         void Serialize(StreamWriter streamWriter, Log log);
         void Serialize(TextWriter textWriter, Log log);
+        string Serialize(Log log);
     }
 }
