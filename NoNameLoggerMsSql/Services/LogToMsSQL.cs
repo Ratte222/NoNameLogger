@@ -11,11 +11,11 @@ using NoNameLogger.Model;
 
 namespace NoNameLoggerMsSql.Services
 {
-    class LogInMsSQL : ILog
+    class LogToMsSQL : ILog
     {
         private readonly MsSQLConfig _config;
 
-        public LogInMsSQL(MsSQLConfig config)
+        public LogToMsSQL(MsSQLConfig config)
         {
             _config = config;
         }
@@ -40,15 +40,15 @@ namespace NoNameLoggerMsSql.Services
             {
                 using(SqlConnection sqlConnection = new SqlConnection(_config.ConnectionString))
                 {
-                    command.CommandText = $"INSERT INTO [{_config.TableName}] ([{nameof(log.Level)}], [{nameof(log.TimeStamp)}], " +
+                    command.CommandText = $"INSERT INTO [{_config.TableName}] ([{nameof(log.Level)}], [{nameof(log.Timestamp)}], " +
                         $"[{nameof(log.Message)}], [{nameof(log.MessageTemplate)}], [{nameof(log.Exception)}], " +
-                        $"[{nameof(log.Properties)}]) VALUES(@{nameof(log.Level)}, @{nameof(log.TimeStamp)}, " +
+                        $"[{nameof(log.Properties)}]) VALUES(@{nameof(log.Level)}, @{nameof(log.Timestamp)}, " +
                         $"@{nameof(log.Message)}, @{nameof(log.MessageTemplate)}, @{nameof(log.Exception)}, " +
                         $"@{nameof(log.Properties)})";
                     sqlConnection.Open();
                     command.Connection = sqlConnection;
                     command.Parameters.AddWithValue(nameof(log.Level), log.Level);
-                    command.Parameters.AddWithValue(nameof(log.TimeStamp), log.TimeStamp);
+                    command.Parameters.AddWithValue(nameof(log.Timestamp), log.Timestamp);
                     command.Parameters.AddWithValue(nameof(log.Message), log.Message);
                     command.Parameters.AddWithValue(nameof(log.MessageTemplate), log.MessageTemplate);
                     command.Parameters.AddWithValue(nameof(log.Exception), log.Exception);

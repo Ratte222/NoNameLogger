@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace NoNameLogger.Services
 {
-    public class LogInFile:ILog
+    public class LogToFile:ILog
     {
         public static AutoResetEvent _waitHandler = new AutoResetEvent(true);
         private FileConfig _fileConfig;
@@ -20,7 +20,7 @@ namespace NoNameLogger.Services
         private Timer _timerStreamWriterFlush = null;
         private FileInfo _fileInfo;
         private DateTime _dateTimeLastCreatedFile;
-        public LogInFile(FileConfig fileConfig)
+        public LogToFile(FileConfig fileConfig)
         {
             _fileConfig = fileConfig;
             

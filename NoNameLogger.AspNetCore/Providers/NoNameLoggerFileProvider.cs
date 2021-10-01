@@ -24,7 +24,7 @@ namespace NoNameLogger.AspNetCore.Providers
 
         public ILogger CreateLogger(string categoryName) =>
             _loggers.GetOrAdd(categoryName, name => new NoNameFileLogger(name, GetCurrentConfig,
-                new List<Interfaces.ILog>(new[] { new Services.LogInFile(GetCurrentConfig().CheckConfiguration()) })));
+                new List<Interfaces.ILog>(new[] { new Services.LogToFile(GetCurrentConfig().CheckConfiguration()) })));
 
         private FileConfiguration GetCurrentConfig() => _currentConfig;
         

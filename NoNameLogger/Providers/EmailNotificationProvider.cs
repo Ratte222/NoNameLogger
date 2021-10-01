@@ -1,5 +1,6 @@
 ﻿using NoNameLogger.Configs.Notification;
 using NoNameLogger.Interfaces;
+using NoNameLogger.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +18,7 @@ namespace NoNameLogger.Providers
 
         public ILog CreateLog()
         {
-            throw new NotImplementedException();
+            return new EmailNotification(_currentConfig);
         }
     }
 }

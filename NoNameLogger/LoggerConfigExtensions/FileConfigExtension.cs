@@ -5,6 +5,7 @@ using NoNameLogger.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using NoNameLogger.Providers;
 
 namespace NoNameLogger.LoggerConfigExtensions
 {
@@ -59,7 +60,7 @@ namespace NoNameLogger.LoggerConfigExtensions
             fileConfig.MaxLogLevel = maxLogLevel;
             fileConfig.RollOnFileSizeLimit = rollOnFileSizeLimit;
             fileConfig.Formatter = formatter;
-            return sinkConfiguration.AddAction(new LogInFile(fileConfig.CheckConfiguration()));
+            return sinkConfiguration.AddSinksProviders(new LogToFileProvider(fileConfig.CheckConfiguration()));
         }
     }
 }

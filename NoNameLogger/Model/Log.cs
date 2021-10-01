@@ -15,14 +15,14 @@ namespace NoNameLogger.Model
         [StringLength(128)]
         public string Level { get; set; }
         [JsonConverter(typeof(Newtonsoft.Json.Converters.IsoDateTimeConverter))]
-        public DateTime TimeStamp { get; set; }
+        public DateTime Timestamp { get; set; }
         public string Exception { get; set; }
         public string Properties { get; set; }
 
         public override string ToString()
         {
             //return base.ToString();
-            return $"{TimeStamp.ToString()}, {Level}, {Message}, " +
+            return $"{Timestamp.ToString()}, {Level}, {Message}, " +
                 $"{Exception}, {Properties}";
         }
     }

@@ -10,11 +10,11 @@ using System.Text;
 
 namespace NoNameLogger.Services
 {
-    internal class LogInConsole:ILog
+    internal class LogToConsole:ILog
     {
         private readonly ConsoleConfig _consoleConfig;
 
-        public LogInConsole(ConsoleConfig consoleConfig)
+        public LogToConsole(ConsoleConfig consoleConfig)
         {
             _consoleConfig = consoleConfig;
         }

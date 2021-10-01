@@ -80,7 +80,7 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
             if (!(typeof(Log).GetAllPublicGetProperty<string>().Any(i => i == logFilter.OrderByField)))
             {
                 Log log = new Log();
-                logFilter.OrderByField = nameof(log.TimeStamp);
+                logFilter.OrderByField = nameof(log.Timestamp);
             }
         }
 
@@ -114,14 +114,14 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
                 if (!firstWhere)
                 { queryBuilder.Append("AND "); }
                 //queryBuilder.Append($"[{nameof(Log.TimeStamp)}] >= {logFilter.StartDate.Value} ");
-                queryBuilder.Append($"[{nameof(Log.TimeStamp)}] >= @StartDate ");
+                queryBuilder.Append($"[{nameof(Log.Timestamp)}] >= @StartDate ");
                 firstWhere = false;
             }
             if (logFilter.EndDate.HasValue)
             {
                 if (!firstWhere)
                 { queryBuilder.Append("AND "); }
-                queryBuilder.Append($"[{nameof(Log.TimeStamp)}] <= @EndDate ");
+                queryBuilder.Append($"[{nameof(Log.Timestamp)}] <= @EndDate ");
                 firstWhere = false;
             }
         }

@@ -13,7 +13,7 @@ namespace NoNameLogger.Extensions
             return new Log()
             {
                 Level = logEvent.LogLevel.ToString(),
-                TimeStamp = logEvent.TimeStamp,
+                Timestamp = logEvent.TimeStamp,
                 Message = String.IsNullOrEmpty(logEvent.Message) ? "" : logEvent.Message,
                 Exception = String.IsNullOrEmpty(logEvent.Exception) ? "" : logEvent.Exception,
                 Properties = String.IsNullOrEmpty(logEvent.Properties) ? "" : logEvent.Properties,

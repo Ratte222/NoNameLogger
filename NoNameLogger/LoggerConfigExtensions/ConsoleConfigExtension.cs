@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using NoNameLogger.Providers;
 
 namespace NoNameLogger.LoggerConfigExtensions
 {
@@ -26,7 +27,8 @@ namespace NoNameLogger.LoggerConfigExtensions
             {
                 consoleConfig.Formatter = formatter;
             }
-            return sinkConfiguration.AddAction(new LogInConsole(consoleConfig));
+            //return sinkConfiguration.AddAction(new LogInConsole(consoleConfig));
+            return sinkConfiguration.AddSinksProviders(new LogToConsoleProvider(consoleConfig));
         }
     }
 }
