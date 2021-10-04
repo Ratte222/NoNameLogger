@@ -26,7 +26,8 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
         public IEnumerable<Log> FetchLogs(LogFilter logFilter, PageResponse<Log> pageResponse)
         {
             var queryBuilder = new StringBuilder();
-            queryBuilder.Append("SELECT [Id], [Message], [Level], [TimeStamp], [Exception], [Properties] FROM [");
+            queryBuilder.Append($"SELECT [{nameof(Log.Id)}], [{nameof(Log.Message)}], [{nameof(Log.Level)}], " +
+                $"[{nameof(Log.Timestamp)}], [{nameof(Log.Exception)}], [{nameof(Log.Properties)}] FROM [");
             queryBuilder.Append(_config.SchemaName);
             queryBuilder.Append("].[");
             queryBuilder.Append(_config.TableName);

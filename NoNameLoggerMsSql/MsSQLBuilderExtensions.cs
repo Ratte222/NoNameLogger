@@ -14,7 +14,7 @@ namespace NoNameLoggerMsSql
     public static class MsSQLBuilderExtensions
     {
         public static LoggerConfiguration MsSQLServer(this LoggerSinkConfiguration sinkConfiguration, string connectionString,
-            string tableName, string schemaName = "dbo", /*IFormatter formatter = null, */bool createTable = true)
+            string tableName, string schemaName = "dbo", /*IFormatter formatter = null, */bool autoCreateTable = true)
         {
             MsSQLConfig config = new MsSQLConfig();
             if (String.IsNullOrEmpty(connectionString)) throw new ArgumentNullException($"{nameof(connectionString)} is null or empty");
@@ -23,7 +23,7 @@ namespace NoNameLoggerMsSql
             config.ConnectionString = connectionString;
             config.TableName = tableName;
             config.SchemaName = schemaName;
-            config.CreateTable = createTable;
+            config.AutoCreateTable = autoCreateTable;
 
             //if(formatter is null)
             //{

@@ -17,7 +17,7 @@ namespace NoNameLoggerMySQL.Services
         public LogToMySQL(MySQLConfig config)
         {
             _config = config;
-            if(config.CreateTable)
+            if(config.AutoCreateTable)
             {
                 CreateTable(GetSqlConnection());
             }
@@ -52,17 +52,18 @@ namespace NoNameLoggerMySQL.Services
 
         private void CreateTable(MySqlConnection sqlConnection)
         {
+            Log logForNameof = new Log();
             try
             {
                 var tableCommandBuilder = new StringBuilder();
                 tableCommandBuilder.Append($"CREATE TABLE IF NOT EXISTS {_config.TableName} (");
-                tableCommandBuilder.Append("Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,");
-                tableCommandBuilder.Append("Timestamp VARCHAR(100),");
-                tableCommandBuilder.Append("Level VARCHAR(15),");
-                tableCommandBuilder.Append("MessageTemplate TEXT,");
-                tableCommandBuilder.Append("Message TEXT,");
-                tableCommandBuilder.Append("Exception TEXT,");
-                tableCommandBuilder.Append("Properties TEXT,");
+                tableCommandBuilder.Append($"{nameof(logForNameof.Id)} BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,");
+                tableCommandBuilder.Append($"{nameof(logForNameof.Timestamp)} VARCHAR(100),");
+                tableCommandBuilder.Append($"{nameof(logForNameof.Level)} VARCHAR(15),");
+                tableCommandBuilder.Append($"{nameof(logForNameof.MessageTemplate)} TEXT,");
+                tableCommandBuilder.Append($"{nameof(logForNameof.Message)} TEXT,");
+                tableCommandBuilder.Append($"{nameof(logForNameof.Exception)} TEXT,");
+                tableCommandBuilder.Append($"{nameof(logForNameof.Properties)} TEXT,");
                 tableCommandBuilder.Append("_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
                 var cmd = sqlConnection.CreateCommand();
@@ -81,9 +82,12 @@ namespace NoNameLoggerMySQL.Services
 
         private MySqlCommand GetInsertCommand(MySqlConnection sqlConnection)
         {
+            Log logForNameof = new Log();
             var tableCommandBuilder = new StringBuilder();
             tableCommandBuilder.Append($"INSERT INTO  {_config.TableName} (");
-            tableCommandBuilder.Append("Timestamp, Level, MessageTemplate, Message, Exception, Properties) ");
+            tableCommandBuilder.Append($"{nameof(logForNameof.Timestamp)}, {nameof(logForNameof.Level)}, " +
+                $"{nameof(logForNameof.MessageTemplate)}, {nameof(logForNameof.Message)}, " +
+                $"{nameof(logForNameof.Exception)}, {nameof(logForNameof.Properties)}) ");
             tableCommandBuilder.Append("VALUES (@ts, @level,@template, @msg, @ex, @prop)");
 
             var cmd = sqlConnection.CreateCommand();

@@ -13,14 +13,14 @@ namespace NoNameLoggerMySQL
     public static class MySQLBuilderExtension
     {
         public static LoggerConfiguration MySQL(this LoggerSinkConfiguration sinkConfiguration, string connectionString,
-            string tableName, /*IFormatter formatter = null,*/ bool createTable = true)
+            string tableName, /*IFormatter formatter = null,*/ bool autoCreateTable = true)
         {
             MySQLConfig config = new MySQLConfig();
             if (String.IsNullOrEmpty(connectionString)) throw new ArgumentNullException($"{nameof(connectionString)} is null or empty");
             if (String.IsNullOrEmpty(tableName)) throw new ArgumentNullException($"{nameof(tableName)} is null or empty");
             config.ConnectionString = connectionString;
             config.TableName = tableName;
-            config.CreateTable = createTable;
+            config.AutoCreateTable = autoCreateTable;
             //if (formatter is null)
             //{
             //    config.Formatter = new StringFormatter();
