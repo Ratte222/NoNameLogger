@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NoNameLoggerMsSqlServerDataProvider.Config
 {
-    class MsSqlServerConfig
+    class MsSqlServerDataProviderConfig
     {
         public string ConnectionString { get; set; }
         public string TableName { get; set; }

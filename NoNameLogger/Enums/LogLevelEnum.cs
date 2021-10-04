@@ -8,7 +8,7 @@ namespace NoNameLogger.Enums
     {
         Trace = 0,
         Debug,
-        Info,
+        Information,
         Warning,
         Error,
         Critical,

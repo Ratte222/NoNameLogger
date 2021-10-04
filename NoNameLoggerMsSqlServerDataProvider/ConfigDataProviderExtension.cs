@@ -9,7 +9,7 @@ using NoNameLoggerMsSqlServerDataProvider.Services;
 
 namespace NoNameLoggerMsSqlServerDataProvider
 {
-    public static class MyLibraryUiBuilderOptions
+    public static class ConfigDataProviderExtension
     {
         public static void UseSqlServer(
             this NoNameLoggerUiOptionsBuilder optionsBuilder,
@@ -23,7 +23,7 @@ namespace NoNameLoggerMsSqlServerDataProvider
 
             if (string.IsNullOrEmpty(tableName))
                 throw new ArgumentNullException(nameof(tableName));
-            var config = new MsSqlServerConfig()
+            var config = new MsSqlServerDataProviderConfig()
             {
                 ConnectionString = connectionString,
                 TableName = tableName,

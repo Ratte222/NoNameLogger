@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoNameLoggerUI", "NoNameLog
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoNameLogger.AspNetCore", "NoNameLogger.AspNetCore\NoNameLogger.AspNetCore.csproj", "{41A548CD-2398-49C8-82DB-D76E12B7F3EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoNameLoggerMySQL", "NoNameLoggerMySQL\NoNameLoggerMySQL.csproj", "{035F9271-B213-4891-A0FD-65EFB1B27AEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoNameLoggerMySQL", "NoNameLoggerMySQL\NoNameLoggerMySQL.csproj", "{035F9271-B213-4891-A0FD-65EFB1B27AEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoNameLoggerMySqlDataProvider", "NoNameLoggerMySqlDataProvider\NoNameLoggerMySqlDataProvider.csproj", "{4FEC2931-DDEA-4033-A697-00699477D6CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{035F9271-B213-4891-A0FD-65EFB1B27AEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{035F9271-B213-4891-A0FD-65EFB1B27AEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{035F9271-B213-4891-A0FD-65EFB1B27AEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FEC2931-DDEA-4033-A697-00699477D6CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FEC2931-DDEA-4033-A697-00699477D6CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FEC2931-DDEA-4033-A697-00699477D6CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FEC2931-DDEA-4033-A697-00699477D6CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -112,7 +112,7 @@ namespace NoNameLogger.Services
 
         public void LogInformation(string message, params object[] args)
         {
-            Log(LogLevel.Info, message, null, args);
+            Log(LogLevel.Information, message, null, args);
         }
 
         public void LogWarning(string message, params object[] args)

@@ -1,63 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using NoNameLogger.Model;
+﻿using NoNameLogger.Model;
+using NoNameLoggerMySqlDataProvider.Config;
 using NoNameLoggerUI.Filters;
-using NoNameLoggerUI.Interface;
-using NoNameLoggerMsSqlServerDataProvider.Config;
-using NoNameLogger.Extensions;
-using System.Data.SqlClient;
-using System.Data;
-using Dapper;
 using NoNameLoggerUI.Helpers;
+using NoNameLoggerUI.Interface;
+using NoNameLogger.Extensions;
+using MySql.Data.MySqlClient;
+using Dapper;
+using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
-namespace NoNameLoggerMsSqlServerDataProvider.Services
+namespace NoNameLoggerMySqlDataProvider.Services
 {
-    class MsSQLServerDataProvider : IDataProvider
+    class MySqlDataProvider : IDataProvider
     {
-        private readonly MsSqlServerDataProviderConfig _config;
+        private readonly MySqlDataProviderConfig _config;
 
-        public MsSQLServerDataProvider(MsSqlServerDataProviderConfig config)
+        public MySqlDataProvider(MySqlDataProviderConfig config)
         {
             _config = config;
         }
 
-        public IEnumerable<Log> FetchLogs(LogFilter logFilter, PageResponse<Log> pageResponse)
-        {
-            var queryBuilder = new StringBuilder();
-            queryBuilder.Append($"SELECT [{nameof(Log.Id)}], [{nameof(Log.Message)}], [{nameof(Log.Level)}], " +
-                $"[{nameof(Log.Timestamp)}], [{nameof(Log.Exception)}], [{nameof(Log.Properties)}] FROM [");
-            queryBuilder.Append(_config.SchemaName);
-            queryBuilder.Append("].[");
-            queryBuilder.Append(_config.TableName);
-            queryBuilder.Append("] ");
-            CheckFilter(logFilter);
-            GenerateWhereClause(queryBuilder, logFilter);
-            queryBuilder.Append($" ORDER BY {logFilter.OrderByField} {logFilter.OrderBy} " +
-            $"OFFSET {pageResponse.Skip} ROWS FETCH NEXT {pageResponse.Take} ROWS ONLY");
-            using (IDbConnection db = new SqlConnection(_config.ConnectionString))
-            {
-                return db.Query<Log>(queryBuilder.ToString(), new
-                {
-                    StartDate = logFilter.StartDate,
-                    EndDate = logFilter.EndDate
-                });
-            }
-        }
-
-        
         public long CountLogs(LogFilter logFilter)
         {
-            CheckFilter(logFilter);
             var queryBuilder = new StringBuilder();
-            queryBuilder.Append($"SELECT Count({nameof(Log.Id)}) FROM [");
-            queryBuilder.Append(_config.SchemaName);
-            queryBuilder.Append("].[");
+            queryBuilder.Append($"SELECT COUNT({nameof(Log.Id)}) FROM `");
             queryBuilder.Append(_config.TableName);
-            queryBuilder.Append("] ");
-            GenerateWhereClause(queryBuilder, logFilter);
-            using (IDbConnection connection = new SqlConnection(_config.ConnectionString))
+            queryBuilder.Append("` ");
+            CheckFilter(logFilter);
+            using (var connection = new MySqlConnection(_config.ConnectionString))
             {
                 return connection.ExecuteScalar<long>(queryBuilder.ToString(), new
                 {
@@ -65,18 +37,38 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
                     EndDate = logFilter.EndDate
                 });
             }
-            
+        }
+
+        public IEnumerable<Log> FetchLogs(LogFilter logFilter, PageResponse<Log> pageResponse)
+        {
+            var queryBuilder = new StringBuilder();
+            queryBuilder.Append($"SELECT {nameof(Log.Id)}, {nameof(Log.Message)}, `{nameof(Log.Level)}`, " +
+                $"{nameof(Log.Timestamp)}, {nameof(Log.Exception)}, {nameof(Log.Properties)} FROM `");
+            queryBuilder.Append(_config.TableName);
+            queryBuilder.Append("` ");
+            CheckFilter(logFilter);
+            GenerateWhereClause(queryBuilder, logFilter);
+            queryBuilder.Append($" ORDER BY {logFilter.OrderByField} {logFilter.OrderBy} " +
+            $"LIMIT {pageResponse.Take} OFFSET {pageResponse.Skip} ");
+            using (var connection = new MySqlConnection(_config.ConnectionString))
+            {
+                return connection.Query<Log>(queryBuilder.ToString(), new
+                {
+                    StartDate = logFilter.StartDate,
+                    EndDate = logFilter.EndDate
+                });
+            }
         }
 
         private void CheckFilter(LogFilter logFilter)
         {
             if (String.IsNullOrEmpty(logFilter.OrderBy))
             {
-                logFilter.OrderBy = "desc";
+                logFilter.OrderBy = "DESC";
             }
-            else if (!String.Equals(logFilter.OrderBy, "asc") && !String.Equals(logFilter.OrderBy, "desc"))
+            else if (!String.Equals(logFilter.OrderBy, "ASC") && !String.Equals(logFilter.OrderBy, "ASC"))
             {
-                logFilter.OrderBy = "desc";
+                logFilter.OrderBy = "DESC";
             }
             if (!(typeof(Log).GetAllPublicGetProperty<string>().Any(i => i == logFilter.OrderByField)))
             {
@@ -99,32 +91,34 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
             {
                 if (!firstWhere)
                 { queryBuilder.Append("AND "); }
-                queryBuilder.Append($"[{nameof(Log.Message)}] LIKE '%{logFilter.SearchString}%' " +
-                    $"OR [{nameof(Log.Exception)}] LIKE '%{logFilter.SearchString}%' ");
+                queryBuilder.Append($"{nameof(Log.Message)} LIKE '%{logFilter.SearchString}%' " +
+                    $"OR {nameof(Log.Exception)} LIKE '%{logFilter.SearchString}%' ");
                 firstWhere = false;
             }
             if (!String.IsNullOrEmpty(logFilter.LevelString))
             {
                 if (!firstWhere)
                 { queryBuilder.Append("AND "); }
-                queryBuilder.Append($"[{nameof(Log.Level)}] = '{logFilter.LevelString}' ");
+                queryBuilder.Append($"`{nameof(Log.Level)}` = '{logFilter.LevelString}' ");
                 firstWhere = false;
             }
-            if(logFilter.StartDate.HasValue)
+            if (logFilter.StartDate.HasValue)
             {
                 if (!firstWhere)
                 { queryBuilder.Append("AND "); }
                 //queryBuilder.Append($"[{nameof(Log.TimeStamp)}] >= {logFilter.StartDate.Value} ");
-                queryBuilder.Append($"[{nameof(Log.Timestamp)}] >= @StartDate ");
+                queryBuilder.Append($"{nameof(Log.Timestamp)} >= @StartDate ");
                 firstWhere = false;
             }
             if (logFilter.EndDate.HasValue)
             {
                 if (!firstWhere)
                 { queryBuilder.Append("AND "); }
-                queryBuilder.Append($"[{nameof(Log.Timestamp)}] <= @EndDate ");
+                queryBuilder.Append($"{nameof(Log.Timestamp)} <= @EndDate ");
                 firstWhere = false;
             }
         }
+
+        
     }
 }
