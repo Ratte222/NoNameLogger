@@ -1,20 +1,22 @@
 
-Configuration of everything
+Configuration example
 In the `Program`:
 ```csharp
+using NoNameLogger.AspNetCore;
+using NoNameLogger.Formatting;
+using NoNameLogger.Services;
+using NoNameLogger.Enums;
+using NoNameLogger.LoggerConfigExtensions;
+...
 public static void Main(string[] args)
 {
     string connection = "ConnectionString";
-    var myLoggerConfig = new LoggerConfiguration()
+    var noNameLoggerConfig = new LoggerConfiguration()
         .WriteTo.Console()
         .WriteTo.File(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
             @"logs", "mylog.json"), new JsonFormatter(), rollingInterval: RollingInterval.Day)
-        .WriteTo.File(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-            @"logs", "mylog.bin"), new BinaryFormatter(), rollingInterval: RollingInterval.Hour)
-        .WriteTo.File(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                @"logs", "mylog.xml"), new XmlFormatter(), rollingInterval: RollingInterval.Minute)
         .WriteTo.MsSQLServer(connection, "TargetTable");
-    NoNameLogger.Interfaces.ILogger logger = myLoggerConfig.CreateLoggger();
+        NoNameLogger.Interfaces.ILogger logger = noNameLoggerConfig.CreateLoggger();
     try
     {
         var host = CreateHostBuilder(args, logger).Build();
@@ -49,6 +51,9 @@ public static IHostBuilder CreateHostBuilder(string[] args, NoNameLogger.Interfa
 ```
 In the `Startup`
 ```csharp
+using NoNameLoggerUI.Extensions;
+using NoNameLoggerMsSqlServerDataProvider;
+...
 public void ConfigureServices(IServiceCollection services)
 {
     .
@@ -70,8 +75,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     app.UseAuthorization();
         
     // Enable middleware to serve log-ui (HTML, JS, CSS, etc.).
-    app.UseNoNameLoggerUI();
-
+    app.UseNoNameLoggerUI();//add for noname logger ui
     app.UseEndpoints(endpoints =>
     {
         endpoints.MapControllerRoute(
@@ -82,14 +86,3 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 
 ```
 
-Table schema:
-```csharp
-public long Id { get; set; }
-public string Message { get; set; }
-public string MessageTemplate { get; set; }
-[StringLength(128)]
-public string Level { get; set; }
-public DateTime TimeStamp { get; set; }
-public string Exception { get; set; }
-public string Properties { get; set; }
-```
