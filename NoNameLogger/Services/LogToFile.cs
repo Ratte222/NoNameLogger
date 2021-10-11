@@ -1,5 +1,6 @@
 using NoNameLogger.Configs;
 using NoNameLogger.Events;
+using NoNameLogger.Enums;
 using NoNameLogger.Extensions;
 using NoNameLogger.Interfaces;
 using System;
@@ -9,17 +10,17 @@ using System.Linq;
 
 namespace NoNameLogger.Services
 {
-    public class LogInFile:ILog
+    public class LogToFile:ILog
     {
         public static AutoResetEvent _waitHandler = new AutoResetEvent(true);
-        private IFileConfig _fileConfig;
+        private FileConfig _fileConfig;
         StreamWriter _streamWriter = null;
         private bool _isDisposed = false;
         private string _fileNameWithoutExtension = "";
         private Timer _timerStreamWriterFlush = null;
         private FileInfo _fileInfo;
         private DateTime _dateTimeLastCreatedFile;
-        public LogInFile(IFileConfig fileConfig)
+        public LogToFile(FileConfig fileConfig)
         {
             _fileConfig = fileConfig;
             

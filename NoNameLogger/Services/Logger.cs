@@ -1,12 +1,14 @@
 ﻿using NoNameLogger.Events;
 using NoNameLogger.Interfaces;
 using NoNameLogger.Extensions;
+using NoNameLogger.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace NoNameLogger.Services
 {
@@ -60,7 +62,9 @@ namespace NoNameLogger.Services
             //if (args != null &&
             //    args.GetType() != typeof(object[]))
             //    args = new object[] { args };
-            StringBuilder stringBuilder = new StringBuilder();
+
+            string properties = "{}";
+            //StringBuilder stringBuilder = new StringBuilder();
             if ((args is null) || (args?.Length == 0))
             {
                 //var stackFrame = FindStackFrame();
@@ -72,15 +76,17 @@ namespace NoNameLogger.Services
             }
             else
             {
+                Dictionary<string, object> pairs = new Dictionary<string, object>();
                 foreach (var arg in args)
                 {
-                    stringBuilder.Append($"{arg}| ");
+                    pairs.Add(arg.GetType().FullName, arg.ToString());
                 }
+                properties = JsonConvert.SerializeObject(pairs);
             }
 
 
-            LogEvent logEvent = new LogEvent(logLevel, null, message, 
-                stringBuilder.ToString().TrimEnd(new char[] { '|', ' ' }));
+            LogEvent logEvent = new LogEvent(logLevel, null, message, properties
+                /*stringBuilder.ToString().TrimEnd(new char[] { '|', ' ' })*/);
             _Log?.Invoke(logEvent);
         }
 
@@ -111,7 +117,7 @@ namespace NoNameLogger.Services
 
         public void LogInformation(string message, params object[] args)
         {
-            Log(LogLevel.Info, message, null, args);
+            Log(LogLevel.Information, message, null, args);
         }
 
         public void LogWarning(string message, params object[] args)

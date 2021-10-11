@@ -29,13 +29,21 @@ namespace NoNameLogger.Configs
         #endregion
         protected List<WriteTo> WritesTo { get; set; } = new List<WriteTo>();
 
-        internal List<ILog> actions { get; private set; } = new List<ILog>();
+        //internal List<ILog> actions { get; private set; } = new List<ILog>();
 
-        public LoggerConfiguration AddAction(ILog log)
+        internal List<ISinksProvider> SinksProviders { get; set; } = new List<ISinksProvider>();
+
+        public LoggerConfiguration AddSinksProviders(ISinksProvider sinksProvider)
         {
-            actions.Add(log);
+            SinksProviders.Add(sinksProvider);
             return _loggerConfiguration;
         }
+
+        //public LoggerConfiguration AddAction(ILog log)
+        //{
+        //    actions.Add(log);
+        //    return _loggerConfiguration;
+        //}
         //internal LoggerConfiguration AddFileConfig(FileConfig fileConfig)
         //{
         //    WritesTo.Add(WriteTo.File);

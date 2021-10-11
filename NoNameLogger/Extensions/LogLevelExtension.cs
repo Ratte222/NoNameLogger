@@ -1,20 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using NoNameLogger.Enums;
 
-namespace NoNameLogger
+namespace NoNameLogger.Extensions
 {
-    public enum LogLevel
-    {
-        Trace = 0,
-        Debug,
-        Info,
-        Warning,
-        Error,
-        Critical,
-        None
-    }
-
     public static class LogLevelExtension
     {
         public static string ToStringFast(this LogLevel logLevel)
@@ -23,7 +13,7 @@ namespace NoNameLogger
             {
                 LogLevel.Trace => nameof(LogLevel.Trace),
                 LogLevel.Debug => nameof(LogLevel.Debug),
-                LogLevel.Info => nameof(LogLevel.Info),
+                LogLevel.Information => nameof(LogLevel.Information),
                 LogLevel.Warning => nameof(LogLevel.Warning),
                 LogLevel.Error => nameof(LogLevel.Error),
                 LogLevel.Critical => nameof(LogLevel.Critical),
@@ -38,7 +28,7 @@ namespace NoNameLogger
             {
                 0 => LogLevel.Trace,
                 1 => LogLevel.Debug,
-                2 => LogLevel.Info,
+                2 => LogLevel.Information,
                 3 => LogLevel.Warning,
                 4 => LogLevel.Error,
                 5 => LogLevel.Critical,

@@ -146,7 +146,7 @@ namespace NoNameLoggerUI.Middleware
                 htmlTableBody.AppendLine("<tr>");
                 htmlTableBody.AppendLine($"<td>{log.Id}</td>");
                 htmlTableBody.AppendLine($"<td>{log.Level}</td>");
-                htmlTableBody.AppendLine($"<td>{log.TimeStamp}</td>");
+                htmlTableBody.AppendLine($"<td>{log.Timestamp}</td>");
                 htmlTableBody.AppendLine($"<td>{log.Message}</td>");
                 //htmlTableBody.AppendLine($"<td>{log.MessageTemplate}</td>");                
                 htmlTableBody.AppendLine($"<td>{log.Exception}</td>");
@@ -165,8 +165,8 @@ namespace NoNameLoggerUI.Middleware
             .ForMember(dest => dest.RowNo, opt => opt.MapFrom(scr => scr.Id))
             .ForMember(dest => dest.PropertyType, opt => opt.MapFrom(scr => "xml"))
             .ForMember(dest => dest.Properties, opt => opt.MapFrom(scr => $"<properties>{scr.Properties}</properties>"))
-            .ForMember(dest => dest.Level, opt => opt.MapFrom(scr => (LogLevel)Enum.Parse(typeof(NoNameLogger.LogLevel), scr.Level)))
-            .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(scr => scr.TimeStamp)));
+            .ForMember(dest => dest.Level, opt => opt.MapFrom(scr => (LogLevel)Enum.Parse(typeof(NoNameLogger.Enums.LogLevel), scr.Level)))
+            .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(scr => scr.Timestamp)));
             var mapper = new Mapper(config);
             var logs = mapper.Map<IEnumerable<Log>, IEnumerable<LogDTO>>(pageResponse.Items);
               long total = provider.CountLogs(logFilter);

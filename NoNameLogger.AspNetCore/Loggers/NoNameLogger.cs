@@ -36,7 +36,7 @@ namespace NoNameLogger.AspNetCore.Loggers
             NoNameLoggerConfig config = _getCurrentConfig();
             if (config.EventId == 0 || config.EventId == eventId.Id)
             {
-                config.Logger.Log(LogLevelExtension.ToLogLeavel((int)logLevel), formatter(state, exception), _name,
+                config.Logger.Log(Extensions.LogLevelExtension.ToLogLeavel((int)logLevel), formatter(state, exception), _name,
                     eventId.Id.ToString(), eventId.Name);
             }
         }

@@ -19,5 +19,10 @@ namespace NoNameLogger.Formatting
         {
             textWriter.WriteLine(log.ToString());
         }
+
+        public string Serialize(Log log)
+        {
+            return log.ToString();
+        }
     }
 }

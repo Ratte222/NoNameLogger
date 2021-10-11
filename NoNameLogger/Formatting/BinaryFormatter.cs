@@ -29,5 +29,18 @@ namespace NoNameLogger.Formatting
                 }
             }
         }
+
+        public string Serialize(Log log)
+        {
+            using (var stream = new MemoryStream())
+            {
+                bin.BinaryFormatter formatter = new bin.BinaryFormatter();
+                formatter.Serialize(stream, log);
+                using (var reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
     }
 }

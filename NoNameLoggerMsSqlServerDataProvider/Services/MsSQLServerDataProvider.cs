@@ -16,9 +16,9 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
 {
     class MsSQLServerDataProvider : IDataProvider
     {
-        private readonly MsSqlServerConfig _config;
+        private readonly MsSqlServerDataProviderConfig _config;
 
-        public MsSQLServerDataProvider(MsSqlServerConfig config)
+        public MsSQLServerDataProvider(MsSqlServerDataProviderConfig config)
         {
             _config = config;
         }
@@ -26,7 +26,8 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
         public IEnumerable<Log> FetchLogs(LogFilter logFilter, PageResponse<Log> pageResponse)
         {
             var queryBuilder = new StringBuilder();
-            queryBuilder.Append("SELECT [Id], [Message], [Level], [TimeStamp], [Exception], [Properties] FROM [");
+            queryBuilder.Append($"SELECT [{nameof(Log.Id)}], [{nameof(Log.Message)}], [{nameof(Log.Level)}], " +
+                $"[{nameof(Log.Timestamp)}], [{nameof(Log.Exception)}], [{nameof(Log.Properties)}] FROM [");
             queryBuilder.Append(_config.SchemaName);
             queryBuilder.Append("].[");
             queryBuilder.Append(_config.TableName);
@@ -80,7 +81,7 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
             if (!(typeof(Log).GetAllPublicGetProperty<string>().Any(i => i == logFilter.OrderByField)))
             {
                 Log log = new Log();
-                logFilter.OrderByField = nameof(log.TimeStamp);
+                logFilter.OrderByField = nameof(log.Timestamp);
             }
         }
 
@@ -114,14 +115,14 @@ namespace NoNameLoggerMsSqlServerDataProvider.Services
                 if (!firstWhere)
                 { queryBuilder.Append("AND "); }
                 //queryBuilder.Append($"[{nameof(Log.TimeStamp)}] >= {logFilter.StartDate.Value} ");
-                queryBuilder.Append($"[{nameof(Log.TimeStamp)}] >= @StartDate ");
+                queryBuilder.Append($"[{nameof(Log.Timestamp)}] >= @StartDate ");
                 firstWhere = false;
             }
             if (logFilter.EndDate.HasValue)
             {
                 if (!firstWhere)
                 { queryBuilder.Append("AND "); }
-                queryBuilder.Append($"[{nameof(Log.TimeStamp)}] <= @EndDate ");
+                queryBuilder.Append($"[{nameof(Log.Timestamp)}] <= @EndDate ");
                 firstWhere = false;
             }
         }

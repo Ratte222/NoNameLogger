@@ -1,5 +1,5 @@
 ﻿
-namespace NoNameLogger
+namespace NoNameLogger.Enums
 {
     public enum RollingInterval
     {

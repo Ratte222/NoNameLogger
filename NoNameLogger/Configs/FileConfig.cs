@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using NoNameLogger.Formatting;
+using NoNameLogger.Enums;
 using NoNameLogger.Interfaces;
 
 namespace NoNameLogger.Configs
 {
-    public class FileConfig:IFileConfig
+    public class FileConfig:BaseConfig, ICommonConfig
     {
         public Encoding Encoding { get; set; }
         public TimeSpan? FlushToDiskInterval { get; set; }
@@ -18,14 +18,14 @@ namespace NoNameLogger.Configs
         public string Path { get; set; }
         public RollingInterval RollingInterval { get; set; } = RollingInterval.Infinite;
         public bool RollOnFileSizeLimit { get; set; } = false;
-        public LogLevel MinLogLevel { get; set; } = LogLevel.Trace;
-        public LogLevel MaxLogLevel { get; set; } = LogLevel.None;
-        //public TextWriter TextWriter { get; set; }
+        //public LogLevel MinLogLevel { get; set; } = LogLevel.Trace;
+        //public LogLevel MaxLogLevel { get; set; } = LogLevel.None;
+        ////public TextWriter TextWriter { get; set; }
 
-        /// <summary>
-        /// Required
-        /// </summary>
-        public IFormatter Formatter{get;set;}
+        ///// <summary>
+        ///// Required
+        ///// </summary>
+        //public IFormatter Formatter{get;set;}
 
 
         public FileConfig CheckConfiguration()

@@ -29,7 +29,12 @@ namespace NoNameLogger.Services
             //{
             //    actions.Add(new LogInFile.LogInFile(fileConf));
             //}
-            return new Logger(WriteTo.actions);
+            List<ILog> logs = new List<ILog>();
+            foreach(var provider in WriteTo.SinksProviders)
+            {
+                logs.Add(provider.CreateLog());
+            }
+            return new Logger(logs);
         }
     }
 }

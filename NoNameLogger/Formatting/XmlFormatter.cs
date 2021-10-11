@@ -21,5 +21,19 @@ namespace NoNameLogger.Formatting
             var serializer = new XmlSerializer(log.GetType());
             serializer.Serialize(textWriter, log);
         }
+
+        public string Serialize(Log log)
+        {
+            var serializer = new XmlSerializer(log.GetType());
+            using (MemoryStream stream = new MemoryStream())
+            {
+                serializer.Serialize(stream, log);
+                using (var reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+            
+        }
     }
 }

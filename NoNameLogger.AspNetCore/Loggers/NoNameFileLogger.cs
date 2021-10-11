@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using logging = Microsoft.Extensions.Logging;
 using NoNameLogger.AspNetCore.Config;
 using NoNameLogger.Services;
+using NoNameLogger.Enums;
 using NoNameLogger.Configs;
+using NoNameLogger.Extensions;
 
 namespace NoNameLogger.AspNetCore.Loggers
 {
