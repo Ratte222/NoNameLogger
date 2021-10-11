@@ -25,7 +25,7 @@ namespace NoNameLoggerMySQL.Services
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            
         }
 
         public void Log(LogEvent logEvent)

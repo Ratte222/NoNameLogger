@@ -76,12 +76,12 @@ namespace NoNameLogger.Services
             }
             else
             {
-                Dictionary<string, object> pairs = new Dictionary<string, object>();
-                foreach (var arg in args)
-                {
-                    pairs.Add(arg.GetType().FullName, arg.ToString());
-                }
-                properties = JsonConvert.SerializeObject(pairs);
+                //Lookup<string, object> pairs = new Lookup<string, object>();
+                //foreach (var arg in args)
+                //{
+                //    pairs.Add(arg.GetType().FullName, arg.ToString());
+                //}
+                properties = JsonConvert.SerializeObject(args);
             }
 
 

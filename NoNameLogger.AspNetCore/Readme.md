@@ -7,6 +7,7 @@ using NoNameLogger.Formatting;
 using NoNameLogger.Services;
 using NoNameLogger.Enums;
 using NoNameLogger.LoggerConfigExtensions;
+using NoNameLoggerMySQL;
 ...
 public static void Main(string[] args)
 {
